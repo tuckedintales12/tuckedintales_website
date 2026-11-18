@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TuckedIn Tales — Where Little Dreams Become Big Stories</title>
+<meta name="description" content="Personalized children's storybooks where your child becomes the hero of their very own adventure.">
+<link rel="icon" href="images/logo-mark.png">
+<meta property="og:title" content="TuckedIn Tales — Personalized Storybooks for Kids">
+<meta property="og:description" content="Turn your child's photo into a magical personalized storybook.">
+<meta property="og:image" content="https://mytuckedintales.com/images/og-image.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:type" content="website"><meta property="og:site_name" content="TuckedIn Tales">
+<meta property="og:url" content="https://mytuckedintales.com/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="TuckedIn Tales — Personalized Storybooks for Kids">
+<meta name="twitter:description" content="Turn your child's photo into a magical personalized storybook.">
+<meta name="twitter:image" content="https://mytuckedintales.com/images/og-image.jpg">
+<link rel="canonical" href="https://mytuckedintales.com/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+:root{
+  --navy:#172c59;--blue:#d8f1ff;--mint:#d9f3ea;--cream:#fff7e8;--pink:#ffe6ee;
+  --lav:#e3d9ff;--gold:#f5b83d;--ink:#26324a;--white:#fff;
+  --shadow:0 8px 0 rgba(23,44,89,.13),0 18px 35px rgba(23,44,89,.12);
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--ink);font-family:"Quicksand",sans-serif;background:var(--cream)}
+h1,h2,h3,h4{font-family:"Baloo 2",sans-serif;color:var(--navy);margin:0 0 .4em;line-height:1.05}
+p{line-height:1.65}.container{width:min(1120px,92%);margin:auto}
+nav{position:sticky;top:0;z-index:20;background:rgba(255,247,232,.93);backdrop-filter:blur(12px);border-bottom:2px solid rgba(23,44,89,.08)}
+.navin{height:74px;display:flex;align-items:center;justify-content:space-between;gap:20px;transition:height .25s ease}
+nav.scrolled .navin{height:58px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--navy);font-family:"Baloo 2";font-size:1.4rem;font-weight:800}
+.brand img{width:44px;height:44px;object-fit:contain;transition:width .25s ease,height .25s ease}
+nav.scrolled .brand img{width:36px;height:36px}
+.links{display:flex;gap:22px;align-items:center}.links a{color:var(--navy);text-decoration:none;font-weight:700;font-size:.92rem}
+.btn{
+  position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px 22px;border:3px solid var(--navy);border-radius:999px;
+  background:linear-gradient(180deg,#ffe77c 0%,#ffc83d 100%);
+  color:var(--navy);font-weight:900;font-size:.9rem;text-decoration:none;
+  box-shadow:0 6px 0 #c28a17, 0 9px 15px rgba(23,44,89,.18);
+  transition:.16s transform,.16s box-shadow;overflow:visible;cursor:pointer
+}
+.btn:before{content:"✦";font-size:1.05em;color:#fff;text-shadow:1px 2px 0 #d49719;pointer-events:none}
+.btn:after{content:"";position:absolute;left:18px;right:18px;top:5px;height:6px;border-radius:99px;background:rgba(255,255,255,.55);pointer-events:none}
+.btn:hover{transform:translateY(-3px) rotate(-1deg);box-shadow:0 9px 0 #c28a17,0 14px 22px rgba(23,44,89,.2)}
+.btn:active{transform:translateY(3px);box-shadow:0 3px 0 #c28a17}
+.btn.blue{background:linear-gradient(180deg,#c8f1ff 0%,#72d0ff 100%);box-shadow:0 6px 0 #4aa5cf,0 9px 15px rgba(23,44,89,.15)}
+.btn.blue:before{color:#fff}
+.btn.pink{background:linear-gradient(180deg,#ffd1e4 0%,#ff78ac 100%);box-shadow:0 6px 0 #c74e7e,0 9px 15px rgba(23,44,89,.15)}
+.btn.pink:before{content:"♥";color:#fff}
+.btn-plain{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;
+  border:2.5px solid var(--navy);border-radius:999px;background:#fff;color:var(--navy);
+  font-family:"Baloo 2";font-weight:700;font-size:.88rem;text-decoration:none;cursor:pointer;
+  transition:.15s transform,.15s background;
+}
+.btn-plain:hover{background:var(--cream);transform:translateY(-2px)}
+.hero{position:relative;padding:56px 0 70px;background:linear-gradient(150deg,#dcf1ff 0%,#efe8ff 52%,#fff6e2 100%);overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:45px;align-items:center}.eyebrow{display:inline-block;padding:6px 13px;border-radius:999px;background:#fff;border:2px solid var(--navy);font-weight:800;font-size:.85rem;margin-bottom:16px}
+.hero h1{font-size:clamp(2.1rem,4.4vw,3.4rem)}.hero h1 span{color:#b35fd2}.hero p{font-size:1rem;max-width:560px}.actions{display:flex;gap:16px;flex-wrap:wrap;margin-top:22px}
+.hero-art{background:rgba(255,255,255,.45);border:4px solid var(--navy);border-radius:38px;padding:15px;box-shadow:var(--shadow);transform:rotate(1.5deg)}
+.hero-art img{display:block;width:100%;border-radius:26px;max-height:520px;object-fit:cover}
+.wave{height:60px;background:var(--mint);clip-path:ellipse(75% 70% at 50% 100%);margin-top:-30px;position:relative;z-index:2}
+section{padding:56px 0}.mint{background:var(--mint)}.pink{background:var(--pink)}.bluebg{background:var(--blue)}
+.section-head{text-align:center;max-width:680px;margin:0 auto 32px}.section-head h2{font-size:clamp(1.6rem,3.2vw,2.3rem)}.section-head p{font-size:.95rem}
+.steps,.themes,.pricing,.trust{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.card{background:#fff;border:3px solid var(--navy);border-radius:26px;padding:24px;box-shadow:var(--shadow);position:relative}
+.step-num{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:#ffd85e;border:3px solid var(--navy);font-family:"Baloo 2";font-size:1.4rem;font-weight:800;margin-bottom:14px;position:relative;z-index:1;box-shadow:3px 4px 0 rgba(23,44,89,.18)}
+.theme{transition:.18s transform,.18s box-shadow}
+.theme:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 11px 0 rgba(23,44,89,.1),0 18px 30px rgba(23,44,89,.12)}
+.theme{transition:.18s transform,.18s box-shadow,.18s border-color}
+.theme.playing{animation:pulseCard 1s ease-in-out infinite}
+.theme.playing .theme-art{position:relative}
+.theme.playing .theme-art:after{content:"🔊";position:absolute;top:10px;right:10px;font-size:1.3rem;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3))}
+@keyframes pulseCard{0%,100%{box-shadow:0 11px 0 rgba(23,44,89,.1),0 18px 30px rgba(23,44,89,.12)}50%{box-shadow:0 11px 0 rgba(23,44,89,.1),0 22px 40px rgba(245,184,61,.5)}}
+
+/* book preview modal */
+.book-preview-modal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.book-preview-modal.open{display:flex}
+.preview-overlay{position:absolute;inset:0;background:rgba(23,44,89,.6);backdrop-filter:blur(3px)}
+.preview-box{position:relative;background:#fff;border:4px solid var(--navy);border-radius:28px;padding:30px;max-width:680px;width:100%;box-shadow:var(--shadow);max-height:90vh;overflow-y:auto}
+.preview-close{position:absolute;top:16px;right:16px;width:38px;height:38px;border-radius:50%;background:#fff;border:2.5px solid var(--navy);font-size:1.1rem;font-weight:800;cursor:pointer;color:var(--navy)}
+.preview-title{text-align:center;margin-bottom:18px}
+.preview-spread{display:grid;grid-template-columns:1fr 1fr;gap:0;border:3px solid var(--navy);border-radius:18px;overflow:hidden}
+.preview-page{padding:24px;min-height:220px;display:flex;align-items:center;justify-content:center}
+.preview-page-art{background:linear-gradient(160deg,#fff4c9,#ffd2e3)}
+.preview-page-art img{max-height:220px;width:auto;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(23,44,89,.18))}
+.preview-page-text{background:var(--cream);border-left:3px dashed rgba(23,44,89,.25);flex-direction:column;align-items:flex-start}
+.preview-page-tag{font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#4aa5cf;margin-bottom:10px}
+.preview-verse{font-family:"Baloo 2",sans-serif;font-weight:600;font-size:1.05rem;line-height:1.6;color:var(--navy);margin:0}
+.preview-footnote{text-align:center;font-size:.82rem;opacity:.7;margin-top:16px;margin-bottom:0}
+@media(max-width:600px){.preview-spread{grid-template-columns:1fr}.preview-page-text{border-left:none;border-top:3px dashed rgba(23,44,89,.25)}}
+.theme{overflow:hidden;padding:0;cursor:pointer}.theme-art{height:190px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-bottom:3px solid var(--navy)}
+.theme-art img{height:104%;width:auto;object-fit:contain;filter:drop-shadow(0 6px 8px rgba(23,44,89,.18))}
+.theme-body{padding:16px}.theme h3{font-size:1.05rem}.theme-body p{font-size:.87rem}
+.themes{grid-template-columns:repeat(4,1fr)}
+.reviews-grid{grid-template-columns:repeat(3,1fr)}
+.price-card{position:relative}.price-card.featured{transform:translateY(-8px);background:#fff4c9}.price{font-family:"Baloo 2";font-size:2.2rem;color:var(--navy)}.price small{font:600 .85rem "Quicksand"}.price-card ul{padding-left:20px;line-height:1.9;font-size:.92rem}.price-card h3{font-size:1.2rem}
+.trust{grid-template-columns:repeat(3,1fr)}.trust .card{text-align:center}.emoji{font-size:2.1rem}
+.cta{background:var(--navy);color:#fff;text-align:center}.cta h2{color:#fff;font-size:clamp(1.7rem,3.6vw,2.6rem)}.cta p{max-width:680px;margin:0 auto 24px;font-size:.95rem}
+footer{background:#102247;color:#dce8ff;padding:38px 0 24px}
+.foot{display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap}
+.foot-links{display:flex;gap:18px;flex-wrap:wrap;font-size:.88rem}.foot-links a{color:#fff;text-decoration:none;opacity:.85}.foot-links a:hover{opacity:1;text-decoration:underline}
+.foot-bottom{margin-top:24px;padding-top:18px;border-top:1px solid rgba(255,255,255,.15);font-size:.8rem;opacity:.75;text-align:center}
+@media(max-width:850px){.hero-grid{grid-template-columns:1fr}.steps,.themes,.pricing,.reviews-grid{grid-template-columns:repeat(2,1fr)}.trust{grid-template-columns:1fr}.links{display:none}.hero{padding-top:36px}}
+@media(max-width:560px){.steps,.themes,.pricing,.reviews-grid{grid-template-columns:1fr}.hero h1{font-size:2.3rem}.navin{height:64px}.brand{font-size:1.2rem}.brand img{width:40px;height:40px}}
+
+/* scroll reveal */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:translateY(0)}
+.steps .card:nth-child(1){transition-delay:0s}.steps .card:nth-child(2){transition-delay:.1s}.steps .card:nth-child(3){transition-delay:.2s}.steps .card:nth-child(4){transition-delay:.3s}
+
+/* trust stats */
+.stats-sec{padding:44px 0;background:#fff}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,220px));justify-content:center;gap:48px;text-align:center}
+.stat-num{font-family:"Baloo 2";font-size:2.3rem;font-weight:800;color:var(--navy)}
+.stat-label{font-size:.82rem;font-weight:700;color:var(--ink);opacity:.75;margin-top:2px}
+@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr);gap:26px}}
+
+/* timeline connecting line */
+.steps-wrap{position:relative}
+.steps-wrap::before{content:"";position:absolute;top:48px;left:12%;right:12%;height:3px;background:repeating-linear-gradient(90deg,var(--navy) 0 12px,transparent 12px 20px);z-index:0}
+@media(max-width:850px){.steps-wrap::before{display:none}}
+
+/* accordion */
+.accordion{max-width:760px;margin:0 auto}
+.accordion-item{border:3px solid var(--navy);border-radius:18px;margin-bottom:14px;overflow:hidden;background:#fff}
+.accordion-q{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:16px 20px;cursor:pointer;font-family:"Baloo 2";font-weight:700;font-size:.98rem;color:var(--navy)}
+.accordion-icon{font-size:1.3rem;transition:transform .25s ease;flex-shrink:0;line-height:1}
+.accordion-item.open .accordion-icon{transform:rotate(135deg)}
+.accordion-a{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.accordion-a p{padding:0 20px 18px;font-size:.92rem;color:var(--ink);margin:0}
+
+/* reviews */
+.review-stars{color:var(--gold);letter-spacing:2px;margin-bottom:10px;font-size:1.05rem}
+.review-name{margin-top:14px;font-weight:700;font-size:.85rem;color:var(--navy)}
+.review-form-card{max-width:600px;margin:36px auto 0;padding:30px}
+.review-form-card h3{text-align:center;margin-bottom:6px}
+.review-form-card>p{text-align:center;font-size:.85rem;margin-top:0;margin-bottom:20px;opacity:.75}
+.rf-field{margin-bottom:16px}
+.rf-field label{display:block;font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;color:var(--navy)}
+.rf-field input,.rf-field textarea{width:100%;padding:12px 14px;border:2.5px solid rgba(23,44,89,.2);border-radius:12px;font-family:"Quicksand";font-size:.95rem;color:var(--ink)}
+.rf-field textarea{resize:vertical;min-height:80px}
+.rf-field select{width:100%;padding:12px 14px;border:2.5px solid rgba(23,44,89,.2);border-radius:12px;font-family:"Quicksand";font-size:.95rem;color:var(--ink);background:#fff}
+.rf-field input:focus,.rf-field textarea:focus,.rf-field select:focus{outline:none;border-color:#ff78ac}
+.rf-hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.bulk-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+@media(max-width:640px){.bulk-grid{grid-template-columns:1fr}}
+.wa-fab{position:fixed;right:16px;bottom:16px;z-index:60;display:none;align-items:center;gap:8px;padding:12px 18px;border-radius:999px;background:#25d366;color:#fff;font-family:"Baloo 2";font-weight:800;font-size:.95rem;border:3px solid var(--navy);box-shadow:0 5px 0 rgba(23,44,89,.35);text-decoration:none}
+.wa-fab:hover{transform:translateY(-2px)}
+@media(max-width:480px){.wa-fab span{display:none}.wa-fab{padding:14px}}
+.star-picker{display:flex;gap:6px;font-size:1.8rem}
+.star-picker span{cursor:pointer;color:#d8dce8;transition:color .15s ease}
+.star-picker span.active{color:var(--gold)}
+.rf-msg{display:none;text-align:center;font-weight:700;padding:12px;border-radius:12px;margin-top:14px;font-size:.9rem}
+.rf-msg.show{display:block}
+.rf-msg.ok{background:#e3f7e9;color:#1e7a3e}
+.security-line{text-align:center;margin-top:26px;font-size:.85rem;font-weight:700;color:var(--navy)}
+</style>
+</head>
+<body>
+<nav id="siteNav"><div class="container navin">
+<a class="brand" href="#"><img src="images/logo-mark.png" alt="TuckedIn Tales logo">TuckedIn Tales</a>
+<div class="links"><a href="#how">How It Works</a><a href="#stories">Stories</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="track.html">Track Order</a><a class="btn" href="order.html">Create a Book</a></div>
+</div></nav>
+
+<header class="hero">
+<div aria-hidden="true" style="position:absolute;inset:80px 0 auto;pointer-events:none;font-size:28px;color:#fff;opacity:.85;letter-spacing:34px;text-align:center">✦ ★ ✦ ★ ✦</div>
+<div class="container hero-grid">
+<div>
+<span class="eyebrow">✨ A story made just for them</span>
+<h1>Where Little Dreams Become <span>Big Stories.</span></h1>
+<p>Turn your child's photo into a magical personalized storybook — with your little one as the hero of the adventure.</p>
+<div class="actions"><a class="btn" href="order.html">Create My Storybook ✨ →</a><a class="btn-plain" href="#stories">Explore Stories</a></div>
+<p style="font-size:.92rem;margin-top:16px">📖 18 illustrated story pages · 3 book sizes to choose from</p>
+</div>
+<div class="hero-art"><img src="images/logo-hero.png" alt="TuckedIn Tales magical bedtime illustration"></div>
+</div>
+</header>
+<div class="wave"></div>
+
+<section class="stats-sec">
+<div class="container">
+<div class="stats reveal" id="statsBlock">
+<div class="stat"><div class="stat-num" data-target="8" data-suffix="">0</div><div class="stat-label">Story Worlds</div></div>
+<div class="stat"><div class="stat-num" data-target="18" data-suffix="">0</div><div class="stat-label">Illustrated Pages</div></div>
+</div>
+</div>
+</section>
+
+<section id="how" class="mint">
+<div class="container">
+<div class="section-head"><h2>From photo to storybook ✨</h2><p>A simple, joyful experience designed for busy parents.</p></div>
+<div class="steps-wrap">
+<div class="steps">
+<div class="card reveal"><div class="step-num">1</div><h3>Upload a photo</h3><p>Share a clear photo of your child so we can personalize their story.</p></div>
+<div class="card reveal"><div class="step-num">2</div><h3>Choose an adventure</h3><p>Pick from eight playful themes made for little imaginations.</p></div>
+<div class="card reveal"><div class="step-num">3</div><h3>Make it theirs</h3><p>Add their name, details, and an optional custom story idea.</p></div>
+<div class="card reveal"><div class="step-num">4</div><h3>Treasure the tale</h3><p>Your personalized book becomes a keepsake they can read again and again.</p></div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="stories" class="bluebg">
+<div class="container">
+<div class="section-head"><h2>Pick their next adventure 🌈</h2><p>Eight story worlds, each waiting for your little hero.</p><p style="font-size:.82rem;opacity:.65;margin-top:-8px">🔊 Click a card for a sound &nbsp;·&nbsp; 👆👆 Double-click to preview two pages</p></div>
+<div class="themes">
+<div class="card theme reveal snd" data-preview-key="chef" style="border-color:#ff78ac"><div class="theme-art" style="background:#ffd2e3"><img src="images/char-chef.png" alt="Master Chef character" loading="lazy"></div><div class="theme-body"><h3>👩‍🍳 Master Chef</h3><p>A delicious kitchen adventure.</p></div></div>
+<div class="card theme reveal snd" data-preview-key="ranger" style="border-color:#4caf6d"><div class="theme-art" style="background:#d7f2c9"><img src="images/char-ranger.png" alt="Jungle Ranger character" loading="lazy"></div><div class="theme-body"><h3>🌿 Jungle Ranger</h3><p>Explore, discover and help animal friends.</p></div></div>
+<div class="card theme reveal snd" data-preview-key="space" style="border-color:#8b6fd6"><div class="theme-art" style="background:#172c59"><img src="images/char-space.png" alt="Space Explorer character" loading="lazy"></div><div class="theme-body"><h3>🚀 Space Explorer</h3><p>Blast off beyond the stars.</p></div></div>
+<div class="card theme reveal snd" data-preview-key="dino" style="border-color:#d99a4e"><div class="theme-art" style="background:#fff0d7"><img src="images/char-dino.png" alt="Dino Discoverer character" loading="lazy"></div><div class="theme-body"><h3>🦕 Dino Discoverer</h3><p>A prehistoric adventure awaits.</p></div></div>
+<div class="card theme reveal snd" data-preview-key="diver" style="border-color:#4aa5cf"><div class="theme-art" style="background:#dff7f2"><img src="images/char-diver.png" alt="Deep Sea Diver character" loading="lazy"></div><div class="theme-body"><h3>🌊 Deep Sea Diver</h3><p>Discover a world beneath the waves.</p></div></div>
+<div class="card theme reveal snd" data-preview-key="maestro" style="border-color:#ff9ecb"><div class="theme-art" style="background:#eee8ff"><img src="images/char-maestro.png" alt="Little Maestro character" loading="lazy"></div><div class="theme-body"><h3>🎵 Little Maestro</h3><p>Make music and magic together.</p></div></div>
+<div class="card theme reveal snd" data-preview-key="ganesha" style="border-color:#f5b83d"><div class="theme-art" style="background:#fff4c9"><img src="images/char-ganesha.png" alt="My Friend Ganesha character" loading="lazy"></div><div class="theme-body"><h3>🐘 My Friend Ganesha</h3><p>A heartwarming magical friendship.</p></div></div>
+<div class="card theme reveal snd" data-preview-key="krishna" style="border-color:#5b7fd6"><div class="theme-art" style="background:#e3edff"><img src="images/char-krishna.png" alt="A Day with Little Krishna character" loading="lazy"></div><div class="theme-body"><h3>🦚 A Day with Little Krishna</h3><p>A playful day of wonder.</p></div></div>
+</div>
+</div>
+</section>
+
+<section id="gallery" class="mint">
+<div class="container">
+<div class="section-head"><h2>See the magic for yourself ✨</h2><p>Real sample pages from real TuckedIn Tales storybooks.</p></div>
+<div class="themes">
+<div class="card theme reveal"><img src="images/sample-chef.jpg" alt="Sample Master Chef storybook page" style="height:210px;width:100%;object-fit:cover;object-position:top center;border-bottom:3px solid var(--navy)"><div class="theme-body"><h3>👩‍🍳 Master Chef</h3><p>A sample page from a real book.</p></div></div>
+<div class="card theme reveal"><img src="images/sample-jungle.jpg" alt="Sample Jungle Ranger storybook page" style="height:210px;width:100%;object-fit:cover;object-position:top center;border-bottom:3px solid var(--navy)"><div class="theme-body"><h3>🌿 Jungle Ranger</h3><p>A sample page from a real book.</p></div></div>
+<div class="card theme reveal"><img src="images/sample-space.jpg" alt="Sample Space Explorer storybook page" style="height:210px;width:100%;object-fit:cover;object-position:top center;border-bottom:3px solid var(--navy)"><div class="theme-body"><h3>🚀 Space Explorer</h3><p>A sample page from a real book.</p></div></div>
+<div class="card theme reveal"><img src="images/sample-bedtime.jpg" alt="Sample bedtime storybook cover" style="height:210px;width:100%;object-fit:cover;object-position:top center;border-bottom:3px solid var(--navy)"><div class="theme-body"><h3>🌙 Bedtime Magic</h3><p>A sample cover from a real book.</p></div></div>
+</div>
+</div>
+</section>
+
+<section id="pricing" class="pink">
+<div class="container">
+<div class="section-head"><h2>Choose their keepsake 💝</h2><p>One softcover storybook, three sizes to choose from.</p></div>
+<div class="pricing">
+<div class="card price-card reveal"><h3>Softcover · 8" × 6"</h3><div class="price">₹699</div><ul><li>18 illustrated pages</li><li>Personalized with your child</li><li>Our classic size</li></ul><a class="btn-plain" href="order.html?size=8x6" style="display:flex">Choose 8" × 6"</a></div>
+<div class="card price-card featured reveal"><h3>Softcover · 9" × 6" ⭐</h3><div class="price">₹799</div><ul><li>18 illustrated pages</li><li>Personalized with your child</li><li>A little more room for the story</li></ul><a class="btn pink" href="order.html?size=9x6">Choose 9" × 6"</a></div>
+<div class="card price-card reveal"><h3>Softcover · 12" × 9"</h3><div class="price">₹1,299</div><ul><li>18 illustrated pages</li><li>Personalized with your child</li><li>Big, bold, gift-worthy pages</li></ul><a class="btn-plain" href="order.html?size=12x9" style="display:flex">Choose 12" × 9"</a></div>
+<div class="card price-card reveal"><h3>Make it extra special</h3><div class="price">+₹299</div><ul><li>Custom story add-on</li><li>Describe your own story idea</li><li>Gift bag +₹30</li></ul><a class="btn-plain" href="order.html" style="display:flex">Customize My Book</a></div>
+</div>
+<p class="security-line">🔒 Secure payments via Razorpay &nbsp;·&nbsp; 💯 Not happy with the illustration? We'll redo it free.</p>
+</div>
+</section>
+
+<section id="reviews">
+<div class="container">
+<div class="section-head"><h2>What Parents Are Saying 💛</h2><p>Be one of our first storytelling families.</p></div>
+<div id="reviewsGrid"><div class="card reveal" style="max-width:600px;margin:0 auto;text-align:center;padding:30px"><p style="margin:0">We're just getting started. Our first families' reviews will appear here once they've received their books. 💛</p></div></div>
+
+<div class="card review-form-card reveal">
+<h3>Share Your Experience</h3>
+<p>Reviews are checked before publishing ✨</p>
+<div class="rf-field">
+  <label for="rfName">Your name</label>
+  <input type="text" id="rfName" placeholder="e.g. Priya S.">
+</div>
+<div class="rf-field">
+  <label>Your rating</label>
+  <div class="star-picker" id="starPicker">
+    <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
+  </div>
+</div>
+<div class="rf-field">
+  <label for="rfComment">Your review</label>
+  <textarea id="rfComment" placeholder="Tell other parents what you loved..."></textarea>
+</div>
+<div style="text-align:center">
+  <button type="button" class="btn" id="rfSubmit" style="width:100%;justify-content:center">Submit Review ✨</button>
+</div>
+<div class="rf-msg" id="rfMsg"></div>
+</div>
+</div>
+</section>
+
+<section id="faq" class="mint">
+<div class="container">
+<div class="section-head"><h2>Questions Parents Ask ❓</h2><p>Everything you need to know before ordering.</p></div>
+<div class="accordion">
+<div class="accordion-item"><div class="accordion-q">How long does delivery take?<span class="accordion-icon">+</span></div><div class="accordion-a"><p>Most storybooks are illustrated, printed, and delivered within 7–10 days across India.</p></div></div>
+<div class="accordion-item"><div class="accordion-q">What if my child's photo isn't clear?<span class="accordion-icon">+</span></div><div class="accordion-a"><p>We recommend a well-lit, front-facing photo without sunglasses or hats. If we run into any issue using your photo, we'll reach out to you before starting illustration — you won't be left guessing.</p></div></div>
+<div class="accordion-item"><div class="accordion-q">Can I make changes after placing an order?<span class="accordion-icon">+</span></div><div class="accordion-a"><p>Reach out within 24 hours of ordering and we'll do our best to update the name, theme, or details before illustration begins.</p></div></div>
+<div class="accordion-item"><div class="accordion-q">Is payment on this site secure?<span class="accordion-icon">+</span></div><div class="accordion-a"><p>Yes — all payments are processed through Razorpay, a PCI-DSS compliant payment gateway used by thousands of Indian businesses. We never see or store your card details.</p></div></div>
+<div class="accordion-item"><div class="accordion-q">What if I'm not happy with the book?<span class="accordion-icon">+</span></div><div class="accordion-a"><p>If the illustration quality isn't right, we'll redo it free of charge. See our Refund Policy for full details.</p></div></div>
+<div class="accordion-item"><div class="accordion-q">Do you deliver across all of India?<span class="accordion-icon">+</span></div><div class="accordion-a"><p>Yes, we deliver pan-India. Delivery charges and timelines are shown at checkout based on your pincode.</p></div></div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="container">
+<div class="section-head"><h2>Made for little hearts ❤️</h2><p>Every story is designed to feel personal, magical and worth keeping.</p></div>
+<div class="trust">
+<div class="card reveal"><div class="emoji">🧒</div><h3>They are the hero</h3><p>The story centers around your child, making reading feel wonderfully personal.</p></div>
+<div class="card reveal"><div class="emoji">✨</div><h3>Made for imagination</h3><p>Friendly adventures, colorful worlds and joyful storytelling for young children.</p></div>
+<div class="card reveal"><div class="emoji">🎁</div><h3>A keepsake to treasure</h3><p>A special gift for birthdays, milestones, bedtime or simply because.</p></div>
+</div>
+</div>
+</section>
+
+<section id="bulk" class="lav" style="background:var(--lav)">
+<div class="container">
+<div class="section-head"><h2>Gifting in bulk? 🎁</h2><p>Schools, playgroups, birthday parties and companies — tell us what you have in mind and we'll get back to you.</p></div>
+<div class="card review-form-card reveal" style="max-width:720px">
+<h3>Bulk &amp; gifting enquiry</h3>
+<p>We usually reply within 2 working days.</p>
+<div class="bulk-grid">
+<div class="rf-field"><label for="bkName">Your name</label><input type="text" id="bkName" maxlength="100" placeholder="e.g. Anita Sharma"></div>
+<div class="rf-field"><label for="bkOrg">School / company (optional)</label><input type="text" id="bkOrg" maxlength="120" placeholder="e.g. Little Stars Playschool"></div>
+<div class="rf-field"><label for="bkContact">Phone or email</label><input type="text" id="bkContact" maxlength="120" placeholder="How should we reach you?"></div>
+<div class="rf-field"><label for="bkQty">How many books?</label>
+<select id="bkQty"><option value="">Choose…</option><option>5 – 10</option><option>11 – 25</option><option>26 – 50</option><option>50+</option><option>Not sure yet</option></select></div>
+</div>
+<div class="rf-field"><label for="bkMsg">Tell us more (optional)</label><textarea id="bkMsg" maxlength="1000" placeholder="Occasion, timeline, anything we should know…"></textarea></div>
+<div class="rf-hp" aria-hidden="true"><label>Leave this empty<input type="text" id="bkWebsite" tabindex="-1" autocomplete="off"></label></div>
+<div style="text-align:center"><button type="button" class="btn" id="bkSubmit" style="width:100%;justify-content:center">Send enquiry ✨</button></div>
+<div class="rf-msg" id="bkMsgBox"></div>
+</div>
+</div>
+</section>
+<section class="cta"><div class="container">
+<h2>Ready to make them the hero?</h2>
+<p>One photo. One adventure. One story they can call their own.</p>
+<a class="btn" href="order.html">Create Their Storybook ✨</a>
+<div style="display:flex;justify-content:center;gap:34px;flex-wrap:wrap;margin-top:30px;font-size:.85rem;font-weight:700;color:#dce8ff">
+<span>💖 Personalized with Love</span>
+<span>🛡️ Safe &amp; Secure Payments</span>
+<span>🚚 Pan India Delivery</span>
+</div>
+</div></section>
+
+<footer><div class="container">
+<div class="foot">
+<div><strong style="color:#fff;font-family:'Baloo 2';font-size:1.15rem">TuckedIn Tales</strong><br>Where Little Dreams Become Big Stories<br><br>📧 tuckedintales.12@gmail.com<br>📍 Ghaziabad, Uttar Pradesh, India</div>
+<div class="foot-links">
+<a href="privacy-policy.html">Privacy Policy</a>
+<a href="shipping-policy.html">Shipping Policy</a>
+<a href="refund-policy.html">Refund Policy</a>
+<a href="terms.html">Terms of Service</a>
+<a href="#faq">FAQ</a>
+<a href="track.html">Track Your Order</a>
+<a href="#bulk">Bulk &amp; Gifting</a>
+</div>
+</div>
+<div class="foot-bottom">© 2026 TuckedIn Tales. Made with imagination for little readers.</div>
+</div></footer>
+
+<div id="bookPreviewModal" class="book-preview-modal">
+  <div id="previewOverlay" class="preview-overlay"></div>
+  <div class="preview-box">
+    <button id="previewCloseBtn" class="preview-close" aria-label="Close preview">✕</button>
+    <h3 id="previewTitle" class="preview-title">Story Title</h3>
+    <div class="preview-spread">
+      <div class="preview-page preview-page-art">
+        <img id="previewCharImg" src="" alt="Preview character">
+      </div>
+      <div class="preview-page preview-page-text">
+        <div class="preview-page-tag">Sample page</div>
+        <p id="previewVerse" class="preview-verse"></p>
+      </div>
+    </div>
+    <p class="preview-footnote">Every page is personalized with your child's face and name — this is just a style preview.</p>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// Optional: connect to Supabase to start collecting real reviews.
+// Same project as order.html — find these in Supabase Project Settings → API.
+const SUPABASE_URL = 'https://ywwugahadsuwgyzceisa.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_u-KZP2jDGhFy_oA1uQPDKQ_HtSD4B8v';
+// ============================================================
+const isConfigured = !SUPABASE_URL.includes('YOUR_PROJECT_REF');
+
+// sticky nav shrink
+const nav = document.getElementById('siteNav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 30);
+});
+
+// scroll reveal
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+}, {threshold:0.12});
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+// animated counters (trigger once when stats block is visible)
+function animateCounters(){
+  document.querySelectorAll('.stat-num').forEach(el => {
+    const target = parseFloat(el.dataset.target);
+    const divide = parseFloat(el.dataset.divide || '1');
+    const decimals = parseInt(el.dataset.decimal || '0');
+    const suffix = el.dataset.suffix || '';
+    const finalVal = target / divide;
+    const duration = 1300;
+    const start = performance.now();
+    function tick(now){
+      const p = Math.min((now-start)/duration, 1);
+      const eased = 1 - Math.pow(1-p, 3);
+      el.textContent = (finalVal*eased).toFixed(decimals) + suffix;
+      if(p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
+}
+const statsIo = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting){ animateCounters(); statsIo.disconnect(); } });
+}, {threshold:0.3});
+statsIo.observe(document.getElementById('statsBlock'));
+
+// click-to-play sound on story cards — one at a time, switching stops the previous
+const clickAudio = new Audio('images/click-sound.mp3');
+let currentlyPlayingCard = null;
+
+document.querySelectorAll('.theme.snd').forEach(card => {
+  card.addEventListener('click', (e) => {
+    if(e.detail > 1) return; // ignore the click that's part of a double-click
+    if(currentlyPlayingCard === card && !clickAudio.paused){
+      // clicking the same card again while it's playing: stop it
+      clickAudio.pause();
+      clickAudio.currentTime = 0;
+      card.classList.remove('playing');
+      currentlyPlayingCard = null;
+      return;
+    }
+    // stop whatever else is playing
+    clickAudio.pause();
+    clickAudio.currentTime = 0;
+    if(currentlyPlayingCard) currentlyPlayingCard.classList.remove('playing');
+    // play this card's sound
+    card.classList.add('playing');
+    currentlyPlayingCard = card;
+    clickAudio.currentTime = 0;
+    clickAudio.play().catch(()=>{});
+  });
+});
+clickAudio.addEventListener('ended', () => {
+  if(currentlyPlayingCard) currentlyPlayingCard.classList.remove('playing');
+  currentlyPlayingCard = null;
+});
+
+// double-click a story card: preview two sample pages
+const themePreviewData = {
+  chef:    { title:'Master Chef', img:'images/char-chef.png',    verse:'"In a kitchen warm where the spices sang,<br>Zara stirred a pot till the whole house rang.<br>She tasted, she twirled, she plated with pride —<br>\'A chef\'s the best dream,\' she grinned, wide-eyed."' },
+  ranger:  { title:'Jungle Ranger', img:'images/char-ranger.png', verse:'"Through the green leaves she quietly crept,<br>Where tigers roamed and old secrets slept.<br>A monkey waved from a vine up high —<br>\'Adventure\'s calling,\' she gave a soft sigh."' },
+  space:   { title:'Space Explorer', img:'images/char-space.png', verse:'"Past the moon and the rings of gold,<br>A tiny rocket, brave and bold.<br>Stars whispered secrets, soft and bright —<br>\'You\'re the bravest explorer tonight.\'"' },
+  dino:    { title:'Dino Discoverer', img:'images/char-dino.png', verse:'"Footprints old in the amber clay,<br>A friendly dino came out to play.<br>\'Roar!\' he said with a toothy grin —<br>\'Let\'s dig up wonders, let the fun begin!\'"' },
+  diver:   { title:'Deep Sea Diver', img:'images/char-diver.png', verse:'"Down where the coral glows soft and blue,<br>A turtle waved and a clownfish too.<br>Bubbles rose like a trail of light —<br>\'The ocean\'s magic, held so tight.\'"' },
+  maestro: { title:'Little Maestro', img:'images/char-maestro.png', verse:'"With a baton raised and a joyful grin,<br>The music swelled as the show could begin.<br>Notes danced high on golden strings —<br>\'Being the maestro means everything!\'"' },
+  ganesha: { title:'My Friend Ganesha', img:'images/char-ganesha.png', verse:'"With ears so big and a gentle smile,<br>Ganesha stayed and chatted a while.<br>\'Good vibes only,\' he said with cheer —<br>\'Wisdom and laughter, always near.\'"' },
+  krishna: { title:'A Day with Little Krishna', img:'images/char-krishna.png', verse:'"With a flute in hand and a peacock plume,<br>Krishna danced in the evening bloom.<br>A calf beside him, soft moos and all —<br>\'Every day\'s magic, big or small.\'"' },
+};
+document.querySelectorAll('.theme.snd').forEach(card => {
+  card.addEventListener('dblclick', () => {
+    const key = card.dataset.previewKey;
+    const data = themePreviewData[key];
+    if(!data) return;
+    openBookPreview(data);
+  });
+});
+function openBookPreview(data){
+  document.getElementById('previewTitle').textContent = data.title;
+  document.getElementById('previewCharImg').src = data.img;
+  document.getElementById('previewVerse').innerHTML = data.verse;
+  document.getElementById('bookPreviewModal').classList.add('open');
+}
+function closeBookPreview(){
+  document.getElementById('bookPreviewModal').classList.remove('open');
+}
+document.getElementById('previewOverlay').addEventListener('click', closeBookPreview);
+document.getElementById('previewCloseBtn').addEventListener('click', closeBookPreview);
+
+// FAQ accordion
+document.querySelectorAll('.accordion-q').forEach(q => {
+  q.addEventListener('click', () => {
+    const item = q.parentElement;
+    const ans = item.querySelector('.accordion-a');
+    document.querySelectorAll('.accordion-item.open').forEach(o => {
+      if(o !== item){ o.classList.remove('open'); o.querySelector('.accordion-a').style.maxHeight = null; }
+    });
+    item.classList.toggle('open');
+    ans.style.maxHeight = item.classList.contains('open') ? ans.scrollHeight + 'px' : null;
+  });
+});
+
+// review star picker
+let selectedRating = 0;
+document.querySelectorAll('#starPicker span').forEach(star => {
+  star.addEventListener('click', () => {
+    selectedRating = parseInt(star.dataset.v, 10);
+    document.querySelectorAll('#starPicker span').forEach(s => {
+      s.classList.toggle('active', parseInt(s.dataset.v,10) <= selectedRating);
+    });
+  });
+});
+
+// show approved reviews (reads only status = approved; see 6-reviews-policy.sql)
+async function loadReviews(){
+  if(!isConfigured) return;
+  try{
+    const res = await fetch(SUPABASE_URL + '/rest/v1/reviews?select=name,rating,comment&status=eq.approved&order=created_at.desc&limit=6', {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+    });
+    if(!res.ok) return;
+    const rows = await res.json();
+    if(!Array.isArray(rows) || !rows.length) return;
+    const grid = document.getElementById('reviewsGrid');
+    grid.className = 'themes reviews-grid';
+    grid.innerHTML = '';
+    rows.forEach(r => {
+      const card = document.createElement('div'); card.className = 'card reveal in';
+      const stars = document.createElement('div'); stars.className = 'review-stars';
+      const n = Math.max(1, Math.min(5, parseInt(r.rating, 10) || 5));
+      stars.textContent = '\u2605'.repeat(n) + '\u2606'.repeat(5 - n);
+      const q = document.createElement('p'); q.textContent = '\u201c' + (r.comment || '') + '\u201d';
+      const who = document.createElement('div'); who.className = 'review-name'; who.textContent = '\u2014 ' + (r.name || 'A happy parent');
+      card.append(stars, q, who); grid.appendChild(card);
+    });
+  }catch(e){ /* keep the friendly empty-state card */ }
+}
+loadReviews();
+
+// review submission
+document.getElementById('rfSubmit').addEventListener('click', async () => {
+  const name = document.getElementById('rfName').value.trim();
+  const comment = document.getElementById('rfComment').value.trim();
+  const msg = document.getElementById('rfMsg');
+  if(!name || !comment || selectedRating === 0){
+    msg.textContent = 'Please add your name, a star rating, and a short review.';
+    msg.className = 'rf-msg show';
+    msg.style.background = '#fde3e3'; msg.style.color = '#a33';
+    return;
+  }
+  if(!isConfigured){
+    msg.textContent = 'Thanks! (Demo mode — connect Supabase in the code to start saving real reviews.)';
+    msg.className = 'rf-msg show ok';
+    document.getElementById('rfName').value=''; document.getElementById('rfComment').value='';
+    selectedRating = 0;
+    document.querySelectorAll('#starPicker span').forEach(s=>s.classList.remove('active'));
+    return;
+  }
+  try{
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const { error: insErr } = await sb.from('reviews').insert({ name, rating: selectedRating, comment, status: 'pending' });
+    if(insErr) throw insErr;
+    msg.textContent = 'Thank you! Your review will appear after a quick check ✨';
+    msg.className = 'rf-msg show ok';
+    document.getElementById('rfName').value=''; document.getElementById('rfComment').value='';
+    selectedRating = 0;
+    document.querySelectorAll('#starPicker span').forEach(s=>s.classList.remove('active'));
+  }catch(err){
+    msg.textContent = 'Something went wrong saving your review. Please try again later.';
+    msg.className = 'rf-msg show';
+    msg.style.background = '#fde3e3'; msg.style.color = '#a33';
+  }
+});
+
+// ================= optional extras: set these to switch them on =================
+const WHATSAPP_NUMBER = '';      // e.g. '919876543210'  (country code + number, digits only). Empty = no WhatsApp button.
+const GA_MEASUREMENT_ID = '';    // e.g. 'G-XXXXXXXXXX'. Empty = no analytics.
+// ===============================================================================
+if(WHATSAPP_NUMBER){
+  const a = document.createElement('a'); a.className='wa-fab'; a.style.display='inline-flex';
+  a.href = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent('Hi TuckedIn Tales! I have a question about a personalized storybook.');
+  a.target='_blank'; a.rel='noopener'; a.setAttribute('aria-label','Chat on WhatsApp');
+  a.innerHTML = '<span style="font-size:1.3rem;line-height:1">💬</span><span>Chat with us</span>';
+  document.body.appendChild(a);
+}
+if(GA_MEASUREMENT_ID){
+  const g = document.createElement('script'); g.async = true; g.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(GA_MEASUREMENT_ID);
+  document.head.appendChild(g);
+  window.dataLayer = window.dataLayer || []; window.gtag = function(){ dataLayer.push(arguments); };
+  gtag('js', new Date()); gtag('config', GA_MEASUREMENT_ID);
+}
+
+// bulk / gifting enquiry
+document.getElementById('bkSubmit').addEventListener('click', async () => {
+  const box = document.getElementById('bkMsgBox');
+  const show = (text, ok) => { box.textContent = text; box.className = 'rf-msg show' + (ok ? ' ok' : ''); if(!ok){ box.style.background='#fde3e3'; box.style.color='#a33'; } else { box.style.background=''; box.style.color=''; } };
+  const name = document.getElementById('bkName').value.trim();
+  const org = document.getElementById('bkOrg').value.trim();
+  const contact = document.getElementById('bkContact').value.trim();
+  const qty = document.getElementById('bkQty').value;
+  const message = document.getElementById('bkMsg').value.trim();
+  if(document.getElementById('bkWebsite').value){ show('Thank you! We\u2019ll be in touch soon \u2728', true); return; } // spam trap
+  const looksOk = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(contact) || /^[+\d][\d\s-]{8,14}$/.test(contact);
+  if(!name || !looksOk){ show('Please add your name and a valid phone number or email.', false); return; }
+  if(!qty){ show('Please choose roughly how many books.', false); return; }
+  if(!isConfigured){ show('Thanks! (Demo mode \u2014 connect Supabase to start receiving enquiries.)', true); return; }
+  const btn = document.getElementById('bkSubmit'); btn.disabled = true;
+  try{
+    const res = await fetch(SUPABASE_URL + '/rest/v1/enquiries', {
+      method: 'POST',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ name, organisation: org || null, contact, quantity: qty, message: message || null })
+    });
+    if(!res.ok) throw new Error('save failed');
+    show('Thank you! We\u2019ll get back to you within 2 working days \u2728', true);
+    ['bkName','bkOrg','bkContact','bkMsg'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('bkQty').value = '';
+  }catch(e){
+    show('Something went wrong sending your enquiry. Please email us at tuckedintales.12@gmail.com.', false);
+  }finally{ btn.disabled = false; }
+});
+</script>
+</body></html>

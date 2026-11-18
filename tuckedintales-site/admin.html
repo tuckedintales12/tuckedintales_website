@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Admin — TuckedIn Tales</title>
+<link rel="icon" href="images/logo-mark.png">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+:root{--navy:#172c59;--cream:#fff7e8;--gold:#f5b83d;--coral:#ff78ac;--teal:#4aa5cf}
+*{box-sizing:border-box}
+body{margin:0;background:#f4f6fb;color:var(--navy);font-family:"Quicksand",sans-serif;font-size:15px;line-height:1.5}
+h1,h2,h3{font-family:"Baloo 2",sans-serif;margin:0}
+input,select,textarea,button{font:inherit;color:var(--navy)}
+input,select,textarea{width:100%;padding:9px 11px;border:2px solid var(--navy);border-radius:10px;background:#fff;font-size:16px}
+button{cursor:pointer;border:2.5px solid var(--navy);border-radius:999px;background:var(--gold);font-weight:800;padding:8px 16px}
+button.sec{background:#fff}
+button.bad{background:#fdecef}
+button:disabled{opacity:.55;cursor:wait}
+#login{max-width:380px;margin:12vh auto;background:#fff;border:3px solid var(--navy);border-radius:22px;padding:26px}
+#login label{display:block;font-weight:700;font-size:.85rem;margin:12px 0 5px}
+#app{display:none}
+header{background:#fff;border-bottom:3px solid var(--navy);padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+header h1{font-size:1.2rem;flex:1}
+.tabs{display:flex;gap:6px;padding:12px 16px 0;flex-wrap:wrap}
+.tab{background:#fff}
+.tab.on{background:var(--navy);color:#fff}
+main{padding:14px 16px 60px;max-width:1000px;margin:auto}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tools input{flex:1;min-width:160px}.tools select{width:auto}
+.card{background:#fff;border:2.5px solid var(--navy);border-radius:16px;padding:14px;margin-bottom:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.pill{display:inline-block;border-radius:999px;border:2px solid var(--navy);padding:1px 10px;font-weight:800;font-size:.75rem;background:#eaf6ff}
+.pill.paid{background:#fff3cf}.pill.shipped,.pill.delivered{background:#d8f3df}.pill.cancelled{background:#fdecef}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:2px 10px;font-size:.88rem;margin-top:8px}
+.kv b{opacity:.65;font-weight:700}
+.kv span{word-break:break-word}
+.edit{margin-top:12px;border-top:2px dashed rgba(23,44,89,.25);padding-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.edit label{font-size:.78rem;font-weight:700}
+.photos{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.photos a{display:block;font-size:.75rem;font-weight:700;text-align:center}
+.photos img{display:block;width:96px;height:96px;object-fit:cover;border-radius:10px;border:2px solid var(--navy)}
+.msg{font-size:.82rem;font-weight:700;margin-top:6px;min-height:1em}
+.ok{color:#1b7a3c}.no{color:#b3203f}
+.muted{opacity:.6}
+#err{color:#b3203f;font-weight:700;margin-top:10px;min-height:1.2em}
+</style>
+</head>
+<body>
+<form id="login">
+  <h2 style="font-size:1.5rem">Admin sign in</h2>
+  <label for="em">Email</label><input id="em" type="email" autocomplete="username" required>
+  <label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" required>
+  <button id="loginBtn" type="submit" style="width:100%;margin-top:16px">Sign in</button>
+  <div id="err" role="alert"></div>
+</form>
+
+<div id="app">
+  <header><h1>TuckedIn Tales · Admin</h1><span id="who" class="muted"></span><button class="sec" id="logout">Sign out</button></header>
+  <div class="tabs">
+    <button class="tab on" data-tab="orders">Orders</button>
+    <button class="tab" data-tab="enquiries">Enquiries</button>
+    <button class="tab" data-tab="reviews">Reviews</button>
+  </div>
+  <main>
+    <section id="orders">
+      <div class="tools">
+        <input id="q" placeholder="Search name, email, phone, order number…">
+        <select id="sf"><option value="">All paid orders</option><option value="paid">New (paid)</option><option value="illustrating">Illustrating</option><option value="printing">Printing</option><option value="shipped">Shipped</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option><option value="pending">Unpaid (pending)</option></select>
+        <button class="sec" id="reload">Refresh</button>
+      </div>
+      <div id="orderList"></div>
+    </section>
+    <section id="enquiries" style="display:none"><div id="enqList"></div></section>
+    <section id="reviews" style="display:none"><div id="revList"></div></section>
+  </main>
+</div>
+
+<script>
+(function(){
+  var SUPABASE_URL = 'https://ywwugahadsuwgyzceisa.supabase.co';
+  var SUPABASE_ANON_KEY = 'sb_publishable_u-KZP2jDGhFy_oA1uQPDKQ_HtSD4B8v';
+  var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  var $ = function(id){ return document.getElementById(id); };
+  var NEXT = { paid:'illustrating', illustrating:'printing', printing:'shipped', shipped:'delivered' };
+  var STATUSES = ['paid','illustrating','printing','shipped','delivered','cancelled'];
+  var allOrders = [];
+
+  // ---- tiny safe DOM helper: text only, never innerHTML ----
+  function el(tag, props, kids){
+    var n = document.createElement(tag);
+    if (props) Object.keys(props).forEach(function(k){
+      if (k === 'text') n.textContent = props[k];
+      else if (k === 'class') n.className = props[k];
+      else if (k === 'on') Object.keys(props.on).forEach(function(ev){ n.addEventListener(ev, props.on[ev]); });
+      else n.setAttribute(k, props[k]);
+    });
+    (kids || []).forEach(function(c){ if (c) n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return n;
+  }
+  function clear(n){ while (n.firstChild) n.removeChild(n.firstChild); }
+  function when(d){ try { return new Date(d).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); } catch(e){ return ''; } }
+  function kv(pairs){
+    var g = el('div',{class:'kv'});
+    pairs.forEach(function(p){ if (p[1] === null || p[1] === undefined || p[1] === '') return; g.appendChild(el('b',{text:p[0]})); g.appendChild(el('span',{text:String(p[1])})); });
+    return g;
+  }
+
+  // ---- sign in / out ----
+  async function showApp(session){
+    $('login').style.display = 'none'; $('app').style.display = 'block';
+    $('who').textContent = session.user.email;
+    loadOrders();
+  }
+  $('login').addEventListener('submit', async function(e){
+    e.preventDefault(); $('err').textContent = '';
+    var b = $('loginBtn'); b.disabled = true;
+    var r = await sb.auth.signInWithPassword({ email: $('em').value.trim(), password: $('pw').value });
+    b.disabled = false;
+    if (r.error || !r.data || !r.data.session) { $('err').textContent = 'Wrong email or password.'; return; }
+    // is this account an admin? (RLS returns nothing for non-admins)
+    var chk = await sb.rpc('is_admin');
+    if (chk.error || chk.data !== true) { await sb.auth.signOut(); $('err').textContent = 'This account is not an admin.'; return; }
+    $('pw').value = '';
+    showApp(r.data.session);
+  });
+  $('logout').addEventListener('click', async function(){ await sb.auth.signOut(); location.reload(); });
+  sb.auth.getSession().then(async function(r){
+    if (r.data && r.data.session) {
+      var chk = await sb.rpc('is_admin');
+      if (chk.data === true) showApp(r.data.session); else await sb.auth.signOut();
+    }
+  });
+
+  // ---- tabs ----
+  document.querySelectorAll('.tab').forEach(function(t){
+    t.addEventListener('click', function(){
+      document.querySelectorAll('.tab').forEach(function(x){ x.classList.toggle('on', x === t); });
+      ['orders','enquiries','reviews'].forEach(function(s){ $(s).style.display = s === t.dataset.tab ? 'block' : 'none'; });
+      if (t.dataset.tab === 'enquiries') loadEnquiries();
+      if (t.dataset.tab === 'reviews') loadReviews();
+    });
+  });
+
+  // ---- ORDERS ----
+  async function loadOrders(){
+    $('orderList').textContent = 'Loading…';
+    var r = await sb.from('orders').select('*').order('created_at', { ascending: false }).limit(300);
+    if (r.error) { $('orderList').textContent = 'Could not load orders: ' + r.error.message; return; }
+    allOrders = r.data || []; renderOrders();
+  }
+  $('reload').addEventListener('click', loadOrders);
+  $('q').addEventListener('input', renderOrders);
+  $('sf').addEventListener('change', renderOrders);
+
+  function renderOrders(){
+    var q = $('q').value.trim().toLowerCase(), sf = $('sf').value;
+    var rows = allOrders.filter(function(o){
+      if (sf ? o.status !== sf : (o.status === 'pending' || o.status === 'verification_failed')) return false;
+      if (!q) return true;
+      return [o.customer_name,o.child_name,o.email,o.phone,o.razorpay_order_id,o.city].join(' ').toLowerCase().indexOf(q) >= 0;
+    });
+    // group sibling rows under their main order
+    var groups = {}, order = [];
+    rows.forEach(function(o){ var k = o.razorpay_order_id || o.id; if (!groups[k]) { groups[k] = []; order.push(k); } groups[k].push(o); });
+    var box = $('orderList'); clear(box);
+    if (!order.length) { box.appendChild(el('p',{class:'muted',text:'No orders here.'})); return; }
+    order.forEach(function(k){ box.appendChild(orderCard(groups[k])); });
+  }
+
+  function orderCard(rows){
+    var o = rows.filter(function(r){ return !r.is_sibling; })[0] || rows[0];
+    var card = el('div',{class:'card','data-order':o.razorpay_order_id || o.id});
+    card.appendChild(el('div',{class:'row'},[
+      el('h3',{text:rows.map(function(r){ return r.child_name; }).join(' & ')}),
+      el('span',{class:'pill ' + o.status, text:o.status})
+    ]));
+    card.appendChild(kv([
+      ['Order', o.razorpay_order_id], ['Placed', when(o.created_at)],
+      ['Total', '₹' + o.amount + (o.coupon_code ? '  (coupon ' + o.coupon_code + ', -₹' + o.discount_amount + ')' : '')],
+      ['Size', o.book_size + (o.gift_bag ? ' + gift bag' : '')],
+      ['Buyer', o.customer_name], ['Email', o.email], ['Phone', o.phone],
+      ['Deliver to', (o.is_gift ? o.recipient_name + ', ' : '') + o.address + ', ' + o.city + ' ' + o.pincode],
+      ['Gift message', o.is_gift ? o.gift_message : '']
+    ]));
+    rows.forEach(function(r){
+      var box = el('div',{style:'margin-top:10px;padding-top:8px;border-top:1px solid rgba(23,44,89,.15)'});
+      box.appendChild(el('b',{text:(r.is_sibling ? '👭 ' : '📖 ') + r.child_name + ', ' + r.child_age + ' (' + r.child_gender + ') — ' + r.story_theme + ' · ' + (r.story_language || 'English')}));
+      box.appendChild(kv([['Custom story', r.customize_addon ? (r.custom_description || '(no details)') : ''], ['Photo notes', r.photo_notes]]));
+      var ph = el('div',{class:'photos'}); box.appendChild(ph);
+      if (r.photo_url) loadPhoto(ph, r.photo_url);
+      card.appendChild(box);
+    });
+
+    if (o.status !== 'pending' && o.status !== 'verification_failed') {
+      var st = el('select'); STATUSES.forEach(function(s){ var op = el('option',{value:s,text:s}); if (s === o.status) op.selected = true; st.appendChild(op); });
+      var courier = el('input',{placeholder:'e.g. Delhivery'}); courier.value = o.courier || '';
+      var tno = el('input',{placeholder:'Tracking number'}); tno.value = o.tracking_number || '';
+      var turl = el('input',{placeholder:'https://…', type:'url'}); turl.value = o.tracking_url || '';
+      var notify = el('input',{type:'checkbox', style:'width:auto'}); notify.checked = true;
+      var msg = el('div',{class:'msg'});
+      var save = el('button',{text:'Save'});
+      var nextBtn = NEXT[o.status] ? el('button',{class:'sec',text:'Move to “' + NEXT[o.status] + '” →',on:{click:function(){ st.value = NEXT[o.status]; save.click(); }}}) : null;
+      save.addEventListener('click', async function(){
+        if (st.value === 'shipped' && !tno.value.trim() && !confirm('No tracking number entered. Mark as shipped anyway?')) return;
+        save.disabled = true; msg.className = 'msg'; msg.textContent = 'Saving…';
+        var sess = (await sb.auth.getSession()).data.session;
+        try {
+          var res = await fetch(SUPABASE_URL + '/functions/v1/admin-update-order', {
+            method:'POST',
+            headers:{ 'Content-Type':'application/json', apikey:SUPABASE_ANON_KEY, Authorization:'Bearer ' + (sess ? sess.access_token : '') },
+            body: JSON.stringify({ order_id:o.id, status:st.value, courier:courier.value, tracking_number:tno.value, tracking_url:turl.value, notify:notify.checked })
+          });
+          var d = await res.json();
+          if (!res.ok) throw new Error(d.error || 'Failed');
+          msg.className = 'msg ok'; msg.textContent = 'Saved' + (d.emailed ? ' · customer emailed ✉️' : (notify.checked && ['illustrating','printing','shipped','delivered'].indexOf(st.value) >= 0 ? ' · (email not sent: not configured or status unchanged)' : ''));
+          await loadOrders();
+        } catch (err) { msg.className = 'msg no'; msg.textContent = 'Error: ' + err.message; }
+        save.disabled = false;
+      });
+      var lab = function(t, n){ return el('div',{},[el('label',{text:t}), n]); };
+      card.appendChild(el('div',{class:'edit'},[
+        lab('Status', st), lab('Courier', courier), lab('Tracking no.', tno), lab('Tracking link', turl),
+        el('div',{},[el('label',{text:'Email customer'}), el('label',{style:'font-weight:600'},[notify, ' send update'])])
+      ]));
+      card.appendChild(el('div',{class:'row',style:'margin-top:10px;justify-content:flex-start'},[save, nextBtn]));
+      card.appendChild(msg);
+    } else {
+      card.appendChild(el('p',{class:'muted',text:'Not paid yet: nothing to do. (Unpaid orders are deleted automatically after 24 hours.)'}));
+    }
+    return card;
+  }
+
+  async function loadPhoto(holder, path){
+    var r = await sb.storage.from('story-photos').createSignedUrl(path, 600);
+    if (r.error || !r.data) { holder.appendChild(el('span',{class:'muted',text:'Photo not available (already cleaned up?)'})); return; }
+    var url = r.data.signedUrl;
+    holder.appendChild(el('a',{href:url,target:'_blank',rel:'noopener noreferrer'},[el('img',{src:url,alt:'Child photo',loading:'lazy'}), 'Open full size']));
+  }
+
+  // ---- ENQUIRIES ----
+  async function loadEnquiries(){
+    var box = $('enqList'); box.textContent = 'Loading…';
+    var r = await sb.from('enquiries').select('*').order('created_at',{ascending:false}).limit(200);
+    clear(box);
+    if (r.error) { box.textContent = 'Could not load: ' + r.error.message; return; }
+    if (!r.data.length) { box.appendChild(el('p',{class:'muted',text:'No enquiries yet.'})); return; }
+    r.data.forEach(function(e){
+      var sel = el('select',{style:'width:auto'}); ['new','replied','closed'].forEach(function(s){ var op = el('option',{value:s,text:s}); if (s === e.status) op.selected = true; sel.appendChild(op); });
+      sel.addEventListener('change', async function(){ var u = await sb.from('enquiries').update({status:sel.value}).eq('id',e.id); if (u.error) alert('Could not update: ' + u.error.message); });
+      var c = el('div',{class:'card'},[ el('div',{class:'row'},[el('h3',{text:e.name + (e.organisation ? ' · ' + e.organisation : '')}), sel]),
+        kv([['Contact',e.contact],['Quantity',e.quantity],['Received',when(e.created_at)],['Message',e.message]]) ]);
+      box.appendChild(c);
+    });
+  }
+
+  // ---- REVIEWS ----
+  async function loadReviews(){
+    var box = $('revList'); box.textContent = 'Loading…';
+    var r = await sb.from('reviews').select('*').order('created_at',{ascending:false}).limit(200);
+    clear(box);
+    if (r.error) { box.textContent = 'Could not load: ' + r.error.message; return; }
+    if (!r.data.length) { box.appendChild(el('p',{class:'muted',text:'No reviews yet.'})); return; }
+    r.data.forEach(function(v){
+      var set = function(status){ return async function(){ var u = await sb.from('reviews').update({status:status}).eq('id',v.id); if (u.error) alert('Could not update: ' + u.error.message); else loadReviews(); }; };
+      var stars = '★★★★★☆☆☆☆☆'.slice(5 - Math.max(0, Math.min(5, v.rating || 0)), 10 - Math.max(0, Math.min(5, v.rating || 0)));
+      box.appendChild(el('div',{class:'card'},[
+        el('div',{class:'row'},[el('h3',{text:v.name + '  ' + stars}), el('span',{class:'pill ' + (v.status === 'approved' ? 'delivered' : v.status === 'rejected' ? 'cancelled' : ''), text:v.status})]),
+        el('p',{text:v.comment}),
+        el('div',{class:'row',style:'justify-content:flex-start'},[
+          v.status !== 'approved' ? el('button',{text:'Approve',on:{click:set('approved')}}) : null,
+          v.status !== 'rejected' ? el('button',{class:'bad',text:'Reject',on:{click:set('rejected')}}) : null,
+          v.status !== 'pending' ? el('button',{class:'sec',text:'Back to pending',on:{click:set('pending')}}) : null
+        ])
+      ]));
+    });
+  }
+})();
+</script>
+</body>
+</html>
